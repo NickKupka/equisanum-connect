@@ -1,0 +1,290 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-reha: var(--reha);
+  --color-reha-foreground: var(--reha-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-linen: var(--linen);
+  --color-sand-gold: var(--sand-gold);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: 'Inter', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'DM Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* EquiSanum Brand Colors — Light Mode */
+/* Primary brand color: rgb(0, 48, 94) = #00305E (deep navy blue) */
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.98 0.003 240 / 0.0);  /* transparent — body gradient shows through */
+  --foreground: oklch(0.97 0.01 240);         /* light text on dark gradient */
+  --card: oklch(1 0 0 / 0.10);               /* glass-white cards */
+  --card-foreground: oklch(0.97 0.01 240);
+  --popover: oklch(0.18 0.07 240 / 0.92);
+  --popover-foreground: oklch(0.97 0.01 240);
+  --primary: oklch(0.55 0.10 240);            /* lighter navy — readable on dark bg */
+  --primary-foreground: oklch(0.99 0 0);
+  --primary-dark: oklch(0.35 0.09 240);
+  --secondary: oklch(1 0 0 / 0.12);           /* glass secondary surface */
+  --secondary-foreground: oklch(0.97 0.01 240);
+  --muted: oklch(1 0 0 / 0.10);              /* subtle glass muted */
+  --muted-foreground: oklch(0.75 0.04 240);   /* readable muted text on dark bg */
+  --accent: oklch(0.62 0.12 220);             /* medium blue accent */
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.52 0.17 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.65 0.14 70);
+  --warning-foreground: oklch(0.18 0.03 240);
+  --info: oklch(0.55 0.1 220);
+  --info-foreground: oklch(0.99 0 0);
+  --success: oklch(0.5 0.1 145);
+  --success-foreground: oklch(0.99 0 0);
+  --reha: oklch(0.52 0.09 200);
+  --reha-foreground: oklch(0.99 0 0);
+  --border: oklch(1 0 0 / 0.15);             /* subtle white border on dark bg */
+  --input: oklch(1 0 0 / 0.12);
+  --ring: oklch(0.65 0.10 240);
+  --linen: oklch(1 0 0 / 0.08);              /* very subtle glass surface */
+  --sand-gold: oklch(0.62 0.12 220);
+  --chart-1: oklch(0.28 0.08 240);
+  --chart-2: oklch(0.45 0.1 230);
+  --chart-3: oklch(0.62 0.12 220);
+  --chart-4: oklch(0.52 0.09 200);
+  --chart-5: oklch(0.5 0.1 145);
+  --sidebar: oklch(1 0 0 / 0.08);
+  --sidebar-foreground: oklch(0.97 0.01 240);
+  --sidebar-primary: oklch(0.55 0.10 240);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(1 0 0 / 0.10);
+  --sidebar-accent-foreground: oklch(0.97 0.01 240);
+  --sidebar-border: oklch(1 0 0 / 0.15);
+  --sidebar-ring: oklch(0.55 0.10 240);
+}
+
+
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background: linear-gradient(
+      155deg,
+      oklch(0.22 0.07 240) 0%,
+      oklch(0.30 0.09 255) 40%,
+      oklch(0.38 0.10 270) 70%,
+      oklch(0.28 0.08 230) 100%
+    );
+    background-attachment: fixed;
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100dvh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer utilities {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* ── Glass Morphism ─────────────────────────────────── */
+
+  /* Main glass panel — for modals, sheets, cards on the gradient bg */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.32),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Stronger glass for modal overlays (sheets/dialogs) */
+  .glass-modal {
+    background: rgba(10, 20, 45, 0.92);
+    backdrop-filter: blur(48px) saturate(1.2);
+    -webkit-backdrop-filter: blur(48px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  }
+
+  /* Light glass card — for content cards inside screens */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.20);
+  }
+
+  /* Glass input field */
+  .glass-input {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: white;
+    outline: none;
+  }
+  .glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.40);
+  }
+  .glass-input:focus {
+    border-color: rgba(255, 255, 255, 0.40);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+  }
+
+  /* Glass button — primary action */
+  .glass-btn-primary {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: white;
+    font-weight: 600;
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.20),
+      inset 0 1px 0 rgba(255, 255, 255, 0.20);
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .glass-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+  .glass-btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  /* Glass overlay backdrop */
+  .glass-overlay {
+    background: rgba(5, 15, 35, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* ── Legacy utility classes (kept for compatibility) ─── */
+
+  .card-equi {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.20);
+  }
+
+  .card-linen {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--radius-lg);
+  }
+
+  .card-gold {
+    background-color: oklch(from var(--color-sand-gold) l c h / 0.1);
+    border: 1px solid oklch(from var(--color-sand-gold) l c h / 0.3);
+    border-radius: var(--radius-lg);
+  }
+
+  .card-reha {
+    background-color: oklch(from var(--color-reha) l c h / 0.08);
+    border: 1px solid oklch(from var(--color-reha) l c h / 0.2);
+    border-radius: var(--radius-lg);
+  }
+
+  .badge-new {
+    background-color: var(--color-accent);
+    color: var(--color-foreground);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 9999px;
+  }
+
+  .text-gradient-primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glass form input — for forms inside glass modals */
+  .form-input-glass {
+    width: 100%;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: white;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .form-input-glass::placeholder {
+    color: rgba(255, 255, 255, 0.40);
+  }
+  .form-input-glass:focus {
+    border-color: rgba(255, 255, 255, 0.40);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+  }
+  .form-input-glass option {
+    background: oklch(0.22 0.07 240);
+    color: white;
+  }
+}
