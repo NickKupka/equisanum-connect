@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EquiSanum Connect – App installieren</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a3e 50%, #0f0f1a 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+  }
+  .logo { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(194,143,90,0.3); }
+  h1 { font-size: 1.75rem; font-weight: 800; text-align: center; margin-bottom: 0.25rem; }
+  h1 span { color: #c28f5a; }
+  .subtitle { color: rgba(255,255,255,0.6); font-size: 0.95rem; text-align: center; margin-bottom: 2rem; }
+
+  .qr-section {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    max-width: 340px;
+    width: 100%;
+  }
+  .qr-section img {
+    width: 180px; height: 180px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 8px;
+  }
+  .qr-label { margin-top: 0.75rem; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+  .open-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #c28f5a, #a0724a);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.9rem 2.5rem;
+    border-radius: 14px;
+    text-decoration: none;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 20px rgba(194,143,90,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .open-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(194,143,90,0.5); }
+
+  .cards { display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; max-width: 720px; width: 100%; }
+
+  .card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 1.5rem;
+    flex: 1 1 300px;
+    max-width: 340px;
+  }
+  .card-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+  .card-icon { font-size: 1.8rem; }
+  .card-title { font-size: 1.1rem; font-weight: 700; }
+  .card-title small { display: block; font-size: 0.75rem; font-weight: 500; color: rgba(255,255,255,0.5); }
+
+  .steps { list-style: none; counter-reset: step; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2.2rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.85);
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: rgba(194,143,90,0.25);
+    color: #c28f5a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .steps li strong { color: #fff; }
+  .highlight { background: rgba(194,143,90,0.15); padding: 0.1rem 0.4rem; border-radius: 6px; font-weight: 600; color: #c28f5a; }
+
+  .footer { margin-top: 2.5rem; color: rgba(255,255,255,0.3); font-size: 0.75rem; text-align: center; }
+  .footer a { color: rgba(255,255,255,0.4); }
+</style>
+</head>
+<body>
+
+  <img src="/icons/android/launchericon-192-192.png" alt="EquiSanum" class="logo" onerror="this.style.display='none'">
+  <h1>Equi<span>Sanum</span> Connect</h1>
+  <p class="subtitle">Deine Pferde-App – jetzt kostenlos installieren</p>
+
+  <div class="qr-section">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://equisanum.nick-kupka.workers.dev&bgcolor=ffffff&color=1a1a3e&margin=8" alt="QR-Code zur App">
+    <p class="qr-label">📷 Scanne den Code mit deiner Kamera</p>
+  </div>
+
+  <a href="https://equisanum.nick-kupka.workers.dev" target="_blank" rel="noopener" class="open-btn">
+    🐴 App jetzt öffnen
+  </a>
+
+  <div class="cards">
+
+    <!-- iOS Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🍎</span>
+        <span class="card-title">iPhone / iPad <small>Installation über Safari</small></span>
+      </div>
+      <ol class="steps">
+        <li>Öffne den Link oben in <strong>Safari</strong></li>
+        <li>Tippe auf das <span class="highlight">⬆️ Teilen-Symbol</span> (unten in der Mitte)</li>
+        <li>Scrolle und wähle <strong>„Zum Home-Bildschirm"</strong></li>
+        <li>Tippe auf <strong>„Hinzufügen"</strong> – fertig! ✨</li>
+      </ol>
+    </div>
+
+    <!-- Android Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🤖</span>
+        <span class="card-title">Android <small>Installation über Chrome</small></span>
+      </div>
+      <ol class="steps">
+        <li>Öffne den Link oben in <strong>Chrome</strong></li>
+        <li>Tippe auf die <span class="highlight">⋮ drei Punkte</span> (oben rechts)</li>
+        <li>Wähle <strong>„App installieren"</strong> oder <strong>„Zum Startbildschirm"</strong></li>
+        <li>Bestätige mit <strong>„Installieren"</strong> – fertig! ✨</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <p class="footer">© 2026 EquiSanum · <a href="https://equisanum.nick-kupka.workers.dev">equisanum.nick-kupka.workers.dev</a></p>
+
+</body>
+</html>
