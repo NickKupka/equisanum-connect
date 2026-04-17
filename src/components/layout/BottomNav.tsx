@@ -25,7 +25,7 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/15 glass-panel">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/15 bg-[rgba(10,15,30,0.85)] backdrop-blur-[48px] [-webkit-backdrop-filter:blur(48px)]">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-1">
         {navItems.map((item) => {
           const isActive = item.matchPrefix
