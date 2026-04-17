@@ -1660,7 +1660,6 @@ function EditHorseSheet({
               ref={photoInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
               className="hidden"
               onChange={handlePhotoChange}
             />
