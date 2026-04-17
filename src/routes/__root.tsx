@@ -39,6 +39,11 @@ export const Route = createRootRoute({
       { title: "EquiSanum – Bewegungstherapie & Pferdetherapie" },
       { name: "description", content: "Die Praxis-App von Laura Kupka – Bewegungstherapeutin & Pferdetherapeutin aus Wolfersdorf bei Freising" },
       { name: "author", content: "EquiSanum" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "EquiSanum" },
+      { name: "theme-color", content: "#c28f5a" },
       { property: "og:title", content: "EquiSanum – Bewegungstherapie & Pferdetherapie" },
       { property: "og:description", content: "Die Praxis-App von Laura Kupka – Bewegungstherapeutin & Pferdetherapeutin" },
       { property: "og:type", content: "website" },
@@ -47,13 +52,17 @@ export const Route = createRootRoute({
     ],
     links: [
       {
+        rel: "manifest",
+        href: "/manifest.json",
+      },
+      {
         rel: "icon",
         type: "image/png",
         href: "/favicon.png",
       },
       {
         rel: "apple-touch-icon",
-        href: "/favicon.png",
+        href: "/icons/ios/180.png",
       },
       {
         rel: "preconnect",

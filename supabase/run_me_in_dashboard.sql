@@ -3,22 +3,25 @@
 -- Fixes: reha_updates RLS, horse sharing columns, news system
 -- ============================================================
 
--- ============ 0) VERIFY ADMIN ROLE EXISTS ============
--- Make sure your admin user has the 'admin' role
--- Replace the email below if needed
+-- ============ 0) VERIFY ADMIN ROLES EXIST ============
+-- Grant admin role to the two authorised admin accounts
 DO $$
 DECLARE
-  admin_uid uuid;
+  uid uuid;
+  admin_emails text[] := ARRAY['info@equisanum.de', 'laura13@online.de'];
+  e text;
 BEGIN
-  SELECT id INTO admin_uid FROM auth.users WHERE email = 'nick.kupka@gmail.com';
-  IF admin_uid IS NOT NULL THEN
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (admin_uid, 'admin')
-    ON CONFLICT DO NOTHING;
-    RAISE NOTICE 'Admin role ensured for %', admin_uid;
-  ELSE
-    RAISE WARNING 'Admin user not found!';
-  END IF;
+  FOREACH e IN ARRAY admin_emails LOOP
+    SELECT id INTO uid FROM auth.users WHERE email = e;
+    IF uid IS NOT NULL THEN
+      INSERT INTO public.user_roles (user_id, role)
+      VALUES (uid, 'admin')
+      ON CONFLICT DO NOTHING;
+      RAISE NOTICE 'Admin role ensured for %', e;
+    ELSE
+      RAISE WARNING 'User not found for email: %', e;
+    END IF;
+  END LOOP;
 END $$;
 
 -- ============ 1) FIX has_role TO BE SECURITY DEFINER ============

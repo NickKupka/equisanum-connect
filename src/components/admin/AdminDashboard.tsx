@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export const ADMIN_EMAIL = "nick.kupka@gmail.com";
+export const ADMIN_EMAILS = ["info@equisanum.de", "laura13@online.de"];
 
 const REHA_CATEGORIES = ["Allgemein", "Training", "Therapie", "Analyse", "Pflege"];
 const MOOD_OPTIONS = [
@@ -62,7 +62,7 @@ type View = "main" | "users" | "horse" | "news";
 export function AdminDashboard() {
   const { user, profile: authProfile } = useAuth();
   const userEmail = user?.email ?? authProfile?.email ?? "";
-  if (userEmail && userEmail !== ADMIN_EMAIL) {
+  if (userEmail && !ADMIN_EMAILS.includes(userEmail)) {
     return <AccessDenied />;
   }
   return <AdminContent userId={user?.id ?? ""} />;
