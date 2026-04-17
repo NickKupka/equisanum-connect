@@ -375,7 +375,7 @@ function AdminHorseView({ horse, ownerProfile, userId, onBack, onRefresh }: {
       ) : (
         <div className="space-y-2">{sharedEntries.map((e) => <SharedEntryCard key={e.id} entry={e} />)}</div>
       )}
-      {addOpen && <AddRehaEntryModal horseId={horse.id} userId={userId} onClose={() => setAddOpen(false)} onSaved={() => { setAddOpen(false); loadEntries(); }} />}
+      {addOpen && <AddRehaEntryModal horseId={horse.id} ownerId={horse.owner_id} userId={userId} onClose={() => setAddOpen(false)} onSaved={() => { setAddOpen(false); loadEntries(); }} />}
     </div>
   );
 }
@@ -434,7 +434,7 @@ function AdminRehaEntryCard({ entry }: { entry: RehaEntry }) {
 
 // ---- AddRehaEntryModal ----
 
-function AddRehaEntryModal({ horseId, userId, onClose, onSaved }: { horseId: string; userId: string; onClose: () => void; onSaved: () => void; }) {
+function AddRehaEntryModal({ horseId, ownerId, userId, onClose, onSaved }: { horseId: string; ownerId: string; userId: string; onClose: () => void; onSaved: () => void; }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -475,7 +475,18 @@ function AddRehaEntryModal({ horseId, userId, onClose, onSaved }: { horseId: str
         photos: photoUrls.length > 0 ? photoUrls : null,
       });
       if (error) { toast.error("Speichern fehlgeschlagen: " + error.message); }
-      else { onSaved(); }
+      else {
+        // Notify horse owner
+        if (ownerId && ownerId !== userId) {
+          await supabase.from("notifications").insert({
+            user_id: ownerId,
+            title: "Neues Reha-Update",
+            message: `Laura hat ein neues Reha-Update eingetragen: ${title.trim() || category}`,
+            type: "reha",
+          });
+        }
+        onSaved();
+      }
     } catch (e) { console.error("Save exception:", e); }
     finally { setSaving(false); }
   };
