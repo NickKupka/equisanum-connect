@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export const ADMIN_EMAILS = ["info@equisanum.de", "laura13@online.de"];
+export const ADMIN_EMAILS = ["info@equisanum.de", "laura13@online.de", "laura.kupka@gmail.com"];
 
 const REHA_CATEGORIES = ["Allgemein", "Training", "Therapie", "Analyse", "Pflege"];
 const MOOD_OPTIONS = [

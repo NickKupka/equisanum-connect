@@ -28,7 +28,7 @@ interface Horse {
 
 
 export function ProfilePage() {
-  const { profile, signOut, user, refetchProfile } = useAuth();
+  const { profile, signOut, user, refetchProfile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const displayName =
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") ||
@@ -109,7 +109,7 @@ export function ProfilePage() {
         <SettingsRow icon={MessageCircle} label="Feedback an Laura" onClick={() => setFeedbackOpen(true)} />
         <SettingsRow icon={HelpCircle} label="Hilfe / FAQ" onClick={() => setFaqOpen(true)} />
         <SettingsRow icon={FileText} label="Impressum und Datenschutz" onClick={() => setImpOpen(true)} />
-        {user?.email === "nick.kupka@gmail.com" && (
+        {isAdmin && (
           <SettingsRow icon={ShieldAlert} label="Adminbereich" onClick={() => navigate({ to: "/admin" })} />
         )}
       </div>
