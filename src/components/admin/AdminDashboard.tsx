@@ -481,7 +481,7 @@ function AddRehaEntryModal({ horseId, ownerId, userId, onClose, onSaved }: { hor
           await supabase.from("notifications").insert({
             user_id: ownerId,
             title: "Neues Reha-Update",
-            message: `Laura hat ein neues Reha-Update eingetragen: ${title.trim() || category}`,
+            body: `Laura hat ein neues Reha-Update eingetragen: ${title.trim() || category}`,
             type: "reha",
           });
         }
