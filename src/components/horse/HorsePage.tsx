@@ -249,30 +249,34 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !user) {
+      toast.error("Fehler: Kein Bild oder nicht eingeloggt (user=" + (user?.id ?? "null") + ")");
+      return;
+    }
     if (galleryPhotos.length >= MAX_GALLERY) {
       toast.error(`Maximal ${MAX_GALLERY} Fotos pro Pferd erlaubt.`);
       return;
     }
     if (file.size > 10 * 1024 * 1024) { toast.error("Bild zu groß – max. 10 MB."); return; }
+    toast.info(`Upload startet… (${file.name}, ${(file.size / 1024).toFixed(0)} KB)`);
     setUploading(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       const path = `${user.id}/${horse.id}/gallery/${fileName}`;
-      const { error } = await supabase.storage.from("media").upload(path, file, {
+      const { data, error } = await supabase.storage.from("media").upload(path, file, {
         contentType: file.type || "image/jpeg",
         cacheControl: "3600",
         upsert: false,
       });
       if (error) {
-        toast.error("Upload fehlgeschlagen: " + (error.message || JSON.stringify(error)));
+        toast.error("❌ Upload-Fehler: " + (error.message ?? JSON.stringify(error)));
       } else {
+        toast.success("✅ Foto hochgeladen! Pfad: " + data?.path);
         await loadGallery();
-        toast.success("Foto hinzugefügt!");
       }
     } catch (err: any) {
-      toast.error("Upload-Fehler: " + (err?.message || String(err)));
+      toast.error("❌ Exception: " + (err?.message || String(err)));
     }
     setUploading(false);
     e.target.value = "";
