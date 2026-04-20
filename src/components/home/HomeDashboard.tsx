@@ -61,6 +61,7 @@ export function HomeDashboard() {
   const [newsPosts, setNewsPosts] = useState<{ id: string; title: string; content: string; image_url: string | null; created_at: string }[]>([]);
   const [newsReactions, setNewsReactions] = useState<{ id: string; news_id: string; user_id: string; emoji: string }[]>([]);
   const [replyNewsId, setReplyNewsId] = useState<string | null>(null);
+  const [firstHorseId, setFirstHorseId] = useState<string | null>(null);
 
   const loadRecent = useCallback(async () => {
     if (!user) return;
@@ -72,9 +73,9 @@ export function HomeDashboard() {
       .select("id,name")
       .eq("owner_id", user.id)
       .eq("archived", false);
-    const horseMap = Object.fromEntries(
-      ((horseData as { id: string; name: string }[]) ?? []).map((h) => [h.id, h.name])
-    );
+    const horseList = (horseData as { id: string; name: string }[]) ?? [];
+    const horseMap = Object.fromEntries(horseList.map((h) => [h.id, h.name]));
+    setFirstHorseId(horseList[0]?.id ?? null);
 
     const [diary, positive, changes] = await Promise.all([
       supabase
@@ -175,8 +176,83 @@ export function HomeDashboard() {
     return `Vor ${days} Tag${days !== 1 ? "en" : ""}`;
   };
 
+  // --- Image Upload State/Refs ---
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // Upload-Logik (analog zu HorsePage)
+  async function uploadImage(bucket: string, path: string, file: File): Promise<string | null> {
+    try {
+      const options = { contentType: file.type || "image/jpeg" };
+      const { error } = await supabase.storage.from(bucket).upload(path, file, options);
+      if (error) {
+        // If duplicate, try with a slightly different path
+        if (error.message?.includes("already exists") || error.message?.includes("Duplicate")) {
+          const altPath = path.replace(/(\.\w+)$/, `_${Date.now()}$1`);
+          const { error: retryErr } = await supabase.storage.from(bucket).upload(altPath, file, options);
+          if (retryErr) { return null; }
+          const { data } = supabase.storage.from(bucket).getPublicUrl(altPath);
+          return `${data.publicUrl}?t=${Date.now()}`;
+        }
+        return null;
+      }
+      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+      return `${data.publicUrl}?t=${Date.now()}`;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Handler für Bildauswahl
+  const handlePhotoPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f || !user) return;
+    if (!firstHorseId) { toast.error("Bitte lege zuerst ein Pferd an, bevor du Fotos hochlädst."); return; }
+    if (f.size > 10 * 1024 * 1024) { toast.error("Bild zu groß – max. 10 MB."); return; }
+    setUploading(true);
+    try {
+      const ext = f.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const path = `${user.id}/dashboard/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const url = await uploadImage("media", path, f);
+      if (!url) { toast.error("Upload fehlgeschlagen"); return; }
+      // Speichere als neuen positiven Eintrag mit dem ersten Pferd des Nutzers
+      const { error } = await supabase.from("positive_entries").insert({
+        horse_id: firstHorseId,
+        user_id: user.id,
+        date: new Date().toISOString().slice(0, 10),
+        content: "Foto aus Galerie",
+        category: "gallery",
+        photo_url: url,
+      } as any);
+      if (error) { toast.error("Fehler beim Speichern des Fotos"); return; }
+      toast.success("Foto gespeichert!");
+      loadRecent();
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-5 px-4 py-5 pb-24">
+      {/* Galerie-Upload */}
+      <div className="mb-2">
+        <button
+          type="button"
+          className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium shadow-sm hover:bg-primary/90 disabled:opacity-50"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? "Lädt..." : "Bild aus Galerie hinzufügen"}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handlePhotoPick}
+        />
+      </div>
       {/* Greeting */}
       <div>
         <h1 className="font-heading text-2xl font-bold text-foreground">
