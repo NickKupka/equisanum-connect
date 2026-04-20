@@ -68,6 +68,7 @@ export function HorsePage() {
   const [selectedHorse, setSelectedHorse] = useState<Horse | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
+  const galleryUploadingRef = useRef(false);
 
   const loadHorses = useCallback(async () => {
     if (!user) return;
@@ -96,12 +97,11 @@ export function HorsePage() {
   }, [user]);
 
   // Load on mount and whenever the window regains focus (e.g. after adding a horse in Profile)
-  // BUT: skip reload while editOpen or uploading to avoid killing the edit sheet
-  // when the user picks a photo (file picker steals focus on mobile)
+  // BUT: skip reload while editOpen or gallery upload is active (file picker steals focus on mobile)
   useEffect(() => {
     loadHorses();
     const onFocus = () => {
-      if (!editOpen) loadHorses();
+      if (!editOpen && !galleryUploadingRef.current) loadHorses();
     };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
@@ -200,7 +200,7 @@ export function HorsePage() {
 
       {/* Tab Content */}
       <div className="mt-4 px-4 pb-24">
-        {activeTab === "overview" && <HorseOverview horse={horse} onRefresh={loadHorses} />}
+        {activeTab === "overview" && <HorseOverview horse={horse} onRefresh={loadHorses} onGalleryUploadingChange={(v) => { galleryUploadingRef.current = v; }} />}
         {activeTab === "reha" && <HorseReha horseId={horse.id} rehaStatus={horse.reha_status} rehaStartDate={(horse as any).reha_start_date} />}
         {activeTab === "diary" && <HorseDiaryTab horseId={horse.id} horseName={horse.name} userId={user!.id} />}
         {activeTab === "positive" && <HorsePositiveTab horseId={horse.id} horseName={horse.name} userId={user!.id} />}
@@ -220,11 +220,12 @@ export function HorsePage() {
   );
 }
 
-function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => void }) {
+function HorseOverview({ horse, onRefresh, onGalleryUploadingChange }: { horse: Horse; onRefresh: () => void; onGalleryUploadingChange?: (v: boolean) => void }) {
   const { user } = useAuth();
   const [galleryPhotos, setGalleryPhotos] = useState<{ url: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const MAX_GALLERY = 10;
 
   const loadGallery = useCallback(async () => {
@@ -259,6 +260,7 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
     if (file.size > 10 * 1024 * 1024) { toast.error("Bild zu groß – max. 10 MB."); return; }
     toast.info(`Upload startet… (${file.name}, ${(file.size / 1024).toFixed(0)} KB)`);
     setUploading(true);
+    onGalleryUploadingChange?.(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
@@ -278,6 +280,7 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
       toast.error("❌ Exception: " + (err?.message || String(err)));
     }
     setUploading(false);
+    onGalleryUploadingChange?.(false);
     e.target.value = "";
   };
 
@@ -337,18 +340,24 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             <p className="text-xs text-muted-foreground mt-0.5">{galleryPhotos.length}/{MAX_GALLERY} Fotos</p>
           </div>
           {galleryPhotos.length < MAX_GALLERY && (
-            <label className={`text-xs font-medium text-primary flex items-center gap-1 cursor-pointer ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+            <button
+              type="button"
+              onClick={() => { onGalleryUploadingChange?.(true); galleryInputRef.current?.click(); }}
+              disabled={uploading}
+              className="text-xs font-medium text-primary disabled:opacity-50 flex items-center gap-1"
+            >
               <Camera className="h-3 w-3" />
               {uploading ? "Lädt..." : "Foto hinzufügen"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleGalleryUpload}
-                disabled={uploading}
-              />
-            </label>
+            </button>
           )}
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleGalleryUpload}
+            disabled={uploading}
+          />
         </div>
         <div className="grid grid-cols-3 gap-2">
           {galleryPhotos.map((item, i) => (
@@ -368,16 +377,14 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             </div>
           ))}
           {galleryPhotos.length === 0 && (
-            <label className={`aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:border-white/40 hover:text-white/50 transition-colors cursor-pointer ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+            <button
+              type="button"
+              onClick={() => { onGalleryUploadingChange?.(true); galleryInputRef.current?.click(); }}
+              disabled={uploading}
+              className="aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:border-white/40 hover:text-white/50 transition-colors cursor-pointer"
+            >
               <Plus className="h-6 w-6" />
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleGalleryUpload}
-                disabled={uploading}
-              />
-            </label>
+            </button>
           )}
         </div>
         {galleryPhotos.length >= MAX_GALLERY && (
