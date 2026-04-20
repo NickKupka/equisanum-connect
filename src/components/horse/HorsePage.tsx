@@ -222,21 +222,24 @@ export function HorsePage() {
 
 function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => void }) {
   const { user } = useAuth();
-  const [galleryPhotos, setGalleryPhotos] = useState<string[]>([]);
+  const [galleryPhotos, setGalleryPhotos] = useState<{ url: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const MAX_GALLERY = 10;
 
   const loadGallery = useCallback(async () => {
     if (!user) return;
     const { data } = await supabase.storage.from("media").list(`${user.id}/${horse.id}/gallery`, { limit: 50 });
     if (data && data.length > 0) {
-      const urls = data
+      const items = data
         .filter((f) => f.name !== ".emptyFolderPlaceholder")
         .map((f) => {
-          const { data: urlData } = supabase.storage.from("media").getPublicUrl(`${user.id}/${horse.id}/gallery/${f.name}`);
-          return `${urlData.publicUrl}?t=${f.updated_at}`;
+          const storagePath = `${user.id}/${horse.id}/gallery/${f.name}`;
+          const { data: urlData } = supabase.storage.from("media").getPublicUrl(storagePath);
+          return { url: `${urlData.publicUrl}?t=${f.updated_at}`, path: storagePath };
         });
-      setGalleryPhotos(urls);
+      setGalleryPhotos(items);
     } else {
       setGalleryPhotos([]);
     }
@@ -246,8 +249,9 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) {
-      console.warn("Gallery upload: no file or no user", { file: !!file, user: !!user });
+    if (!file || !user) return;
+    if (galleryPhotos.length >= MAX_GALLERY) {
+      toast.error(`Maximal ${MAX_GALLERY} Fotos pro Pferd erlaubt.`);
       return;
     }
     if (file.size > 10 * 1024 * 1024) { toast.error("Bild zu groß – max. 10 MB."); return; }
@@ -256,25 +260,39 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
       const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       const path = `${user.id}/${horse.id}/gallery/${fileName}`;
-      console.log("Gallery upload: starting", { path, bucket: "media", size: file.size, type: file.type });
-      const { data, error } = await supabase.storage.from("media").upload(path, file, {
+      const { error } = await supabase.storage.from("media").upload(path, file, {
         contentType: file.type || "image/jpeg",
         cacheControl: "3600",
         upsert: false,
       });
       if (error) {
-        console.error("Gallery upload error:", JSON.stringify(error));
         toast.error("Upload fehlgeschlagen: " + (error.message || JSON.stringify(error)));
       } else {
-        console.log("Gallery upload success:", data);
         await loadGallery();
+        toast.success("Foto hinzugefügt!");
       }
     } catch (err: any) {
-      console.error("Gallery upload exception:", err);
       toast.error("Upload-Fehler: " + (err?.message || String(err)));
     }
     setUploading(false);
     e.target.value = "";
+  };
+
+  const handleDeletePhoto = async (storagePath: string) => {
+    if (!user) return;
+    setDeleting(storagePath);
+    try {
+      const { error } = await supabase.storage.from("media").remove([storagePath]);
+      if (error) {
+        toast.error("Löschen fehlgeschlagen: " + error.message);
+      } else {
+        await loadGallery();
+        toast.success("Foto gelöscht.");
+      }
+    } catch (err: any) {
+      toast.error("Fehler beim Löschen: " + (err?.message || String(err)));
+    }
+    setDeleting(null);
   };
 
   return (
@@ -310,17 +328,22 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
 
       {/* Gallery */}
       <div className="card-equi p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-heading text-sm font-semibold text-foreground">Galerie</h3>
-          <button
-            type="button"
-            onClick={() => galleryInputRef.current?.click()}
-            disabled={uploading}
-            className="text-xs font-medium text-primary disabled:opacity-50 flex items-center gap-1"
-          >
-            <Camera className="h-3 w-3" />
-            {uploading ? "Lädt..." : "Foto hinzufügen"}
-          </button>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="font-heading text-sm font-semibold text-foreground">Galerie</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">{galleryPhotos.length}/{MAX_GALLERY} Fotos</p>
+          </div>
+          {galleryPhotos.length < MAX_GALLERY && (
+            <button
+              type="button"
+              onClick={() => galleryInputRef.current?.click()}
+              disabled={uploading}
+              className="text-xs font-medium text-primary disabled:opacity-50 flex items-center gap-1"
+            >
+              <Camera className="h-3 w-3" />
+              {uploading ? "Lädt..." : "Foto hinzufügen"}
+            </button>
+          )}
           <input
             ref={galleryInputRef}
             type="file"
@@ -330,10 +353,21 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             disabled={uploading}
           />
         </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {galleryPhotos.map((url, i) => (
-            <div key={i} className="aspect-square rounded-lg overflow-hidden bg-muted">
-              <img src={url} alt="" className="h-full w-full object-cover" />
+        <div className="grid grid-cols-3 gap-2">
+          {galleryPhotos.map((item, i) => (
+            <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-muted group">
+              <img src={item.url} alt="" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => handleDeletePhoto(item.path)}
+                disabled={deleting === item.path}
+                className="absolute top-1 right-1 h-6 w-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity active:opacity-100 disabled:opacity-40"
+                title="Foto löschen"
+              >
+                {deleting === item.path
+                  ? <span className="h-3 w-3 animate-spin rounded-full border border-white border-t-transparent" />
+                  : <X className="h-3.5 w-3.5 text-white" />}
+              </button>
             </div>
           ))}
           {galleryPhotos.length === 0 && (
@@ -347,6 +381,9 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             </button>
           )}
         </div>
+        {galleryPhotos.length >= MAX_GALLERY && (
+          <p className="mt-2 text-xs text-muted-foreground text-center">Maximale Anzahl von {MAX_GALLERY} Fotos erreicht. Bitte lösche ein Foto, um ein neues hinzuzufügen.</p>
+        )}
       </div>
 
       {/* Sharing Toggles */}
