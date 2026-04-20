@@ -225,7 +225,6 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
   const [galleryPhotos, setGalleryPhotos] = useState<{ url: string; path: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
   const MAX_GALLERY = 10;
 
   const loadGallery = useCallback(async () => {
@@ -338,24 +337,18 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             <p className="text-xs text-muted-foreground mt-0.5">{galleryPhotos.length}/{MAX_GALLERY} Fotos</p>
           </div>
           {galleryPhotos.length < MAX_GALLERY && (
-            <button
-              type="button"
-              onClick={() => galleryInputRef.current?.click()}
-              disabled={uploading}
-              className="text-xs font-medium text-primary disabled:opacity-50 flex items-center gap-1"
-            >
+            <label className={`text-xs font-medium text-primary flex items-center gap-1 cursor-pointer ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
               <Camera className="h-3 w-3" />
               {uploading ? "Lädt..." : "Foto hinzufügen"}
-            </button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleGalleryUpload}
+                disabled={uploading}
+              />
+            </label>
           )}
-          <input
-            ref={galleryInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleGalleryUpload}
-            disabled={uploading}
-          />
         </div>
         <div className="grid grid-cols-3 gap-2">
           {galleryPhotos.map((item, i) => (
@@ -375,14 +368,16 @@ function HorseOverview({ horse, onRefresh }: { horse: Horse; onRefresh: () => vo
             </div>
           ))}
           {galleryPhotos.length === 0 && (
-            <button
-              type="button"
-              onClick={() => galleryInputRef.current?.click()}
-              disabled={uploading}
-              className="aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:border-white/40 hover:text-white/50 transition-colors cursor-pointer"
-            >
+            <label className={`aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:border-white/40 hover:text-white/50 transition-colors cursor-pointer ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
               <Plus className="h-6 w-6" />
-            </button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleGalleryUpload}
+                disabled={uploading}
+              />
+            </label>
           )}
         </div>
         {galleryPhotos.length >= MAX_GALLERY && (
