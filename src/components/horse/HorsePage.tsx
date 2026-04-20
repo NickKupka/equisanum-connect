@@ -249,35 +249,30 @@ function HorseOverview({ horse, onRefresh, onGalleryUploadingChange }: { horse: 
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) {
-      toast.error("Fehler: Kein Bild oder nicht eingeloggt (user=" + (user?.id ?? "null") + ")");
-      return;
-    }
+    if (!file || !user) return;
     if (galleryPhotos.length >= MAX_GALLERY) {
       toast.error(`Maximal ${MAX_GALLERY} Fotos pro Pferd erlaubt.`);
       return;
     }
     if (file.size > 10 * 1024 * 1024) { toast.error("Bild zu groß – max. 10 MB."); return; }
-    toast.info(`Upload startet… (${file.name}, ${(file.size / 1024).toFixed(0)} KB)`);
     setUploading(true);
     onGalleryUploadingChange?.(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       const path = `${user.id}/${horse.id}/gallery/${fileName}`;
-      const { data, error } = await supabase.storage.from("media").upload(path, file, {
+      const { error } = await supabase.storage.from("media").upload(path, file, {
         contentType: file.type || "image/jpeg",
         cacheControl: "3600",
         upsert: false,
       });
       if (error) {
-        toast.error("❌ Upload-Fehler: " + (error.message ?? JSON.stringify(error)));
+        toast.error("Upload fehlgeschlagen: " + error.message);
       } else {
-        toast.success("✅ Foto hochgeladen! Pfad: " + data?.path);
         await loadGallery();
       }
     } catch (err: any) {
-      toast.error("❌ Exception: " + (err?.message || String(err)));
+      toast.error("Upload-Fehler: " + (err?.message || String(err)));
     }
     setUploading(false);
     onGalleryUploadingChange?.(false);
@@ -293,7 +288,6 @@ function HorseOverview({ horse, onRefresh, onGalleryUploadingChange }: { horse: 
         toast.error("Löschen fehlgeschlagen: " + error.message);
       } else {
         await loadGallery();
-        toast.success("Foto gelöscht.");
       }
     } catch (err: any) {
       toast.error("Fehler beim Löschen: " + (err?.message || String(err)));
